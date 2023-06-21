@@ -1,5 +1,11 @@
+import Link from "next/link";
 import type { FC } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
+import ProfileImage from "./ProfileImage";
+
+const dateTimeFormatter = new Intl.DateTimeFormat(undefined, {
+  dateStyle: "short",
+});
 
 interface User {
   id: string;
@@ -39,8 +45,6 @@ const InfiniteTweetsList: FC<InfiniteTweetsListProps> = ({
     );
   }
 
-  console.log(tweets);
-
   return (
     <ul>
       <InfiniteScroll
@@ -50,10 +54,49 @@ const InfiniteTweetsList: FC<InfiniteTweetsListProps> = ({
         loader={"loading"}
       >
         {tweets.map((tweet) => (
-          <li key={tweet.id}>{tweet.content}</li>
+          <TweetCard
+            content={tweet.content}
+            createdAt={tweet.createdAt}
+            likedByMe={tweet.likedByMe}
+            id={tweet.id}
+            likesCount={tweet.likesCount}
+            user={tweet.user}
+            key={tweet.id}
+          />
         ))}
       </InfiniteScroll>
     </ul>
+  );
+};
+
+const TweetCard: FC<Tweet> = ({
+  id,
+  user,
+  content,
+  createdAt,
+  likesCount,
+  likedByMe,
+}) => {
+  return (
+    <li className="flex gap-4 border-b border-white/20 p-4">
+      <Link href={`/profile/${user.id}`}>
+        <ProfileImage src={user.image} />
+      </Link>
+      <div className="flex flex-grow flex-col">
+        <div className="flex gap-2">
+          <Link
+            href={`/profile/${user.id}`}
+            className="font-bold hover:underline focus-visible:underline focus-visible:outline-none"
+          >
+            {user.name}
+          </Link>
+          <span className="text-gray-200">-</span>
+          <span className="text-gray-200">
+            {dateTimeFormatter.format(createdAt)}
+          </span>
+        </div>
+      </div>
+    </li>
   );
 };
 
