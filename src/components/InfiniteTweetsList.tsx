@@ -5,6 +5,7 @@ import ProfileImage from "./ProfileImage";
 import { useSession } from "next-auth/react";
 import { VscHeart, VscHeartFilled } from "react-icons/vsc";
 import IconHoverEffect from "./IconHoverEffect";
+import { api } from "~/utils/api";
 
 const dateTimeFormatter = new Intl.DateTimeFormat(undefined, {
   dateStyle: "short",
@@ -80,6 +81,12 @@ const TweetCard: FC<Tweet> = ({
   likesCount,
   likedByMe,
 }) => {
+  const toggleLike = api.tweet.toggleLike.useMutation();
+
+  const handleToggleLike = () => {
+    toggleLike.mutate({ id });
+  };
+
   return (
     <li className="flex gap-4 border-b border-white/20 p-4">
       <Link href={`/profile/${user.id}`}>
@@ -99,7 +106,12 @@ const TweetCard: FC<Tweet> = ({
           </span>
         </div>
         <p className="whitespace-pre-wrap">{content}</p>
-        <HearthButton likedByMe={likedByMe} likesCount={likesCount} />
+        <HearthButton
+          onClick={handleToggleLike}
+          isLoading={toggleLike.isLoading}
+          likedByMe={likedByMe}
+          likesCount={likesCount}
+        />
       </div>
     </li>
   );
@@ -108,9 +120,16 @@ const TweetCard: FC<Tweet> = ({
 type HearthButtonProps = {
   likedByMe: boolean;
   likesCount: number;
+  isLoading: boolean;
+  onClick: () => void;
 };
 
-const HearthButton = ({ likedByMe, likesCount }: HearthButtonProps) => {
+const HearthButton = ({
+  likedByMe,
+  likesCount,
+  isLoading,
+  onClick,
+}: HearthButtonProps) => {
   const session = useSession();
   const HearthIcon = likedByMe ? VscHeartFilled : VscHeart;
 
@@ -125,6 +144,8 @@ const HearthButton = ({ likedByMe, likesCount }: HearthButtonProps) => {
   }
   return (
     <button
+      disabled={isLoading}
+      onClick={onClick}
       className={`group flex items-center gap-2 self-start transition-colors duration-100 ${
         likedByMe
           ? "text-red-500"
