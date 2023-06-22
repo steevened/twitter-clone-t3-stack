@@ -37,7 +37,7 @@ interface InfiniteTweetsListProps {
 const InfiniteTweetsList: FC<InfiniteTweetsListProps> = ({
   tweets,
   fetchNewTweets,
-  hasMore,
+  hasMore = false,
   isError,
   isLoading,
 }) => {
@@ -81,7 +81,38 @@ const TweetCard: FC<Tweet> = ({
   likesCount,
   likedByMe,
 }) => {
-  const toggleLike = api.tweet.toggleLike.useMutation();
+  const trpcUtils = api.useContext();
+
+  const toggleLike = api.tweet.toggleLike.useMutation({
+    onSuccess: ({ addedLike }) => {
+      const updateData: Parameters<
+        typeof trpcUtils.tweet.infiniteFeed.setInfiniteData
+      >[1] = (oldData) => {
+        if (oldData == null) return;
+
+        const countModifier = addedLike ? 1 : -1;
+        return {
+          ...oldData,
+          pages: oldData.pages.map((page) => {
+            return {
+              ...page,
+              tweets: page.tweets.map((tweet) => {
+                if (tweet.id == id) {
+                  return {
+                    ...tweet,
+                    likesCount: tweet.likesCount + countModifier,
+                    likedByMe: addedLike,
+                  };
+                }
+                return tweet;
+              }),
+            };
+          }),
+        };
+      };
+      trpcUtils.tweet.infiniteFeed.setInfiniteData({}, updateData);
+    },
+  });
 
   const handleToggleLike = () => {
     toggleLike.mutate({ id });
@@ -146,7 +177,7 @@ const HearthButton = ({
     <button
       disabled={isLoading}
       onClick={onClick}
-      className={`group flex items-center gap-2 self-start transition-colors duration-100 ${
+      className={`group flex cursor-pointer items-center gap-2 self-start transition-colors duration-100 ${
         likedByMe
           ? "text-red-500"
           : "text-gray-500 hover:text-red-500 focus-visible:text-red-500 "
