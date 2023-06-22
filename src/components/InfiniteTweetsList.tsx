@@ -4,6 +4,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import ProfileImage from "./ProfileImage";
 import { useSession } from "next-auth/react";
 import { VscHeart, VscHeartFilled } from "react-icons/vsc";
+import IconHoverEffect from "./IconHoverEffect";
 
 const dateTimeFormatter = new Intl.DateTimeFormat(undefined, {
   dateStyle: "short",
@@ -127,17 +128,19 @@ const HearthButton = ({ likedByMe, likesCount }: HearthButtonProps) => {
       className={`group flex items-center gap-2 self-start transition-colors duration-100 ${
         likedByMe
           ? "text-red-500"
-          : "text-gray-200 hover:text-red-500 focus-visible:text-red-500 "
+          : "text-gray-500 hover:text-red-500 focus-visible:text-red-500 "
       }`}
     >
-      <HearthIcon
-        className={`transition-colors duration-100 ${
-          likedByMe
-            ? "fill-red-500"
-            : "fill-gray-500 group-hover:fill-red-500 group-focus-visible:fill-red-500"
-        }`}
-      />
-      <span className="text-gray-500">{likesCount}</span>
+      <IconHoverEffect red>
+        <HearthIcon
+          className={`transition-colors duration-100 ${
+            likedByMe
+              ? "fill-red-500"
+              : "fill-gray-500 group-hover:fill-red-500 group-focus-visible:fill-red-500"
+          }`}
+        />
+      </IconHoverEffect>
+      <span className="">{likesCount}</span>
     </button>
   );
 };
