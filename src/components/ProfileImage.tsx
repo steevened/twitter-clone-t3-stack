@@ -10,7 +10,7 @@ type ProfileImageProps = {
 const ProfileImage: FC<ProfileImageProps> = ({ src, className = "" }) => {
   return (
     <div
-      className={`relative aspect-square w-12 overflow-hidden rounded-full ${className}`}
+      className={`relative aspect-square w-12  overflow-hidden rounded-full  ${className}`}
     >
       {src == null ? (
         <VscAccount className="h-full w-full" />

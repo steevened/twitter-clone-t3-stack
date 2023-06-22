@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { FC } from "react";
 import IconHoverEffect from "./IconHoverEffect";
 import { VscAccount, VscHome, VscSignIn, VscSignOut } from "react-icons/vsc";
+import ProfileImage from "./ProfileImage";
 
 const SideNav: FC = ({}) => {
   const session = useSession();
@@ -27,7 +28,13 @@ const SideNav: FC = ({}) => {
             <Link href={`/profile/${user.id}`}>
               <IconHoverEffect>
                 <span className="flex items-center gap-4">
-                  <VscAccount className="h-8 w-8" />
+                  {/* <VscAccount className="h-8 w-8" /> */}
+
+                  <ProfileImage
+                    className="w-8"
+                    src={session?.data?.user.image}
+                  />
+
                   <span className="hidden text-lg md:inline">Profile</span>
                 </span>
               </IconHoverEffect>

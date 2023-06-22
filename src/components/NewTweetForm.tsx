@@ -1,4 +1,4 @@
-import { useState, type FC, FormEvent } from "react";
+import { useState, type FC, type FormEvent } from "react";
 import TextareaAutosize from "react-textarea-autosize";
 import Button from "./Button";
 import ProfileImage from "./ProfileImage";
