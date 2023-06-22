@@ -2,6 +2,8 @@ import Link from "next/link";
 import type { FC } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import ProfileImage from "./ProfileImage";
+import { useSession } from "next-auth/react";
+import { VscHeart, VscHeartFilled } from "react-icons/vsc";
 
 const dateTimeFormatter = new Intl.DateTimeFormat(undefined, {
   dateStyle: "short",
@@ -83,7 +85,7 @@ const TweetCard: FC<Tweet> = ({
         <ProfileImage src={user.image} />
       </Link>
       <div className="flex flex-grow flex-col">
-        <div className="flex gap-2">
+        <div className="flex gap-1">
           <Link
             href={`/profile/${user.id}`}
             className="font-bold hover:underline focus-visible:underline focus-visible:outline-none"
@@ -91,12 +93,52 @@ const TweetCard: FC<Tweet> = ({
             {user.name}
           </Link>
           <span className="text-gray-200">-</span>
-          <span className="text-gray-200">
+          <span className="text-gray-400">
             {dateTimeFormatter.format(createdAt)}
           </span>
         </div>
+        <p className="whitespace-pre-wrap">{content}</p>
+        <HearthButton likedByMe={likedByMe} likesCount={likesCount} />
       </div>
     </li>
+  );
+};
+
+type HearthButtonProps = {
+  likedByMe: boolean;
+  likesCount: number;
+};
+
+const HearthButton = ({ likedByMe, likesCount }: HearthButtonProps) => {
+  const session = useSession();
+  const HearthIcon = likedByMe ? VscHeartFilled : VscHeart;
+
+  if (session.status !== "authenticated") {
+    return (
+      <div className=" mb-1 mt-2 flex items-center gap-3 self-start text-gray-500">
+        <HearthIcon />
+
+        <span>{likesCount}</span>
+      </div>
+    );
+  }
+  return (
+    <button
+      className={`group flex items-center gap-2 self-start transition-colors duration-100 ${
+        likedByMe
+          ? "text-red-500"
+          : "text-gray-200 hover:text-red-500 focus-visible:text-red-500 "
+      }`}
+    >
+      <HearthIcon
+        className={`transition-colors duration-100 ${
+          likedByMe
+            ? "fill-red-500"
+            : "fill-gray-500 group-hover:fill-red-500 group-focus-visible:fill-red-500"
+        }`}
+      />
+      <span className="text-gray-500">{likesCount}</span>
+    </button>
   );
 };
 
